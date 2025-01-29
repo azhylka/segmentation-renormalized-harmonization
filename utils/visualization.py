@@ -22,7 +22,7 @@ def tensorboard_vis(summarywriter, step, board_name, img_list, num_row, cmaps, t
     """
     fig = plt.figure()
     num_figs = len(img_list)
-    num_col = np.ceil(num_figs/ num_row)
+    num_col = int(np.ceil(num_figs/ num_row))
     print('Visualizing %d images in %d row %d column'%(num_figs, num_row, num_col))
 
     for i in range(num_figs):

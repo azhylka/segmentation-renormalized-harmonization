@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import numpy as np
-from . import networks3d, networks2d
+from . import networks2d #networks3d, 
 from .base_model import BaseModel
 import itertools
 
@@ -37,7 +37,7 @@ class CycleGAN(BaseModel):
             self.loss_names.append('idt_B')
 
         self.visual_names = visual_names_A + visual_names_B  # combine visualizations for A and B
-        self.sigma = opt.noise_std
+        # self.sigma = opt.noise_std
         # specify the models you want to save to the disk.
         # The training/test scripts will call <BaseModel.save_networks> and <BaseModel.load_networks>.
         if self.isTrain:
@@ -45,10 +45,10 @@ class CycleGAN(BaseModel):
         else:  # during test time, only load Gs
             self.model_names = ['G_A', 'G_B']
 
-        if opt.dim == 2:
-            networks = networks2d
-        else:
-            networks = networks3d
+        # if opt.dim == 2:
+        networks = networks2d
+        # else:
+        #     networks = networks3d
 
         # define networks
         film_nc = opt.seg_nc
@@ -97,6 +97,7 @@ class CycleGAN(BaseModel):
                 if opt.dataset == 'ixi': seg_weights = [0.5, 0.5, 0.5, 0.5]
                 if opt.dataset == 'retouch': seg_weights = [0.3, 0.7, 0.7, 0.7]
                 if opt.dataset == 'msseg': seg_weights = [0.2, 0.8]
+                if opt.dataset == 'rms': seg_weights = [0.2, 0.8]
                 self.criterionSeg = nn.CrossEntropyLoss(weight=torch.tensor(seg_weights).cuda())
             # initialize optimizers; schedulers will be automatically created by function <BaseModel.setup>.
 
@@ -116,17 +117,17 @@ class CycleGAN(BaseModel):
 
 
     def set_input(self, input):
-        self.real_A = input['A'].to(self.device)
-        self.real_B = input['B'].to(self.device)
+        self.real_A = input['A'].to(torch.float).to(self.device)
+        self.real_B = input['B'].to(torch.float).to(self.device)
         if self.learn_seg:
-            self.seg_A = input['A_seg'].to(self.device)
-            self.seg_B = input['B_seg'].to(self.device)
+            self.seg_A = input['A_seg'].to(torch.float).to(self.device)
+            self.seg_B = input['B_seg'].to(torch.float).to(self.device)
         else:
             self.seg_A = None
             self.seg_B = None
         if self.add_mask:
-            self.mask_A = input['A_mask'].to(self.device)
-            self.mask_B = input['B_mask'].to(self.device)
+            self.mask_A = input['A_mask'].to(torch.float).to(self.device)
+            self.mask_B = input['B_mask'].to(torch.float).to(self.device)
         if self.sem_dropout:
             SM = networks2d.PairedSemanticDropout(0.3, 4)
             self.real_A, self.seg_A, self.real_B, self.seg_B = SM(self.real_A, self.seg_A, self.real_B, self.seg_B)

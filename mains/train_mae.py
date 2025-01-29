@@ -158,8 +158,6 @@ if __name__ == '__main__':
                 writer.add_scalar('train/reconstruction', recon_loss, step)
                 plt.close()
 
-
-
         scheduler.step(epoch)
         if epoch % opt.save_epoch_freq == 0:  # cache our latest model every <save_latest_freq> iterations
             print('saving the latest model (epoch %d, total_iters %d)' % (epoch, step))

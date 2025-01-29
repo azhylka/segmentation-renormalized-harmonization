@@ -106,7 +106,7 @@ def init_net(net, init_type='normal', init_gain=0.02, gpu_ids=[]):
     """
     if len(gpu_ids) > 0:
         #assert(torch.cuda.is_available())
-        net.cuda()#to(gpu_ids[0])
+        net.cuda() #to(gpu_ids[0])
         #net = torch.nn.DataParallel(net, gpu_ids)  # multi-GPUs
     init_weights(net, init_type, init_gain=init_gain)
     return net
@@ -477,9 +477,10 @@ class SRenormGenerator(nn.Module):
         for param in self.parameters():
             param.requires_grad = requires_grad
 
-    def forward(self, input, seg):
-        #self.set_required_grad(not freeze)
-        seg_feat, seg_rep, seg_off, loss = self.shared_seg_feature(input, seg)
+    def forward(self, input, seg, freeze):
+        self.set_required_grad(not freeze)
+        # seg_feat, seg_rep, seg_off, loss = self.shared_seg_feature(input, seg)
+        seg_feat = self.shared_seg_feature(input, seg)
         x = self.head(input)  # n, w/2, h/2
         x = F.relu(x)
         x_0 = self.down_spade_0(x, seg_feat)  # 2n, w/2, h/2
